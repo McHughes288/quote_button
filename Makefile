@@ -6,7 +6,7 @@ includes="*.py"
 all: deps check
 
 deps:
-	./setup.sh
+	./scripts/setup.sh
 check:
 	black --check "${includes}"
 	flake8 --max-line-length=100 "${includes}"
