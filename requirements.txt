@@ -1,0 +1,7 @@
+sounddevice
+pydub
+numpy
+jupyterlab
+black
+flake8
+pylint
