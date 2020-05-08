@@ -1,10 +1,9 @@
-
 import sounddevice as sd
 import numpy as np
 
-fs=16000
+fs = 16000
 duration = 8  # seconds
-myrecording = sd.rec(duration * fs, samplerate=fs, channels=1, dtype='float32')
+myrecording = sd.rec(duration * fs, samplerate=fs, channels=1, dtype="float32")
 print("Recording Audio")
 sd.wait()
 

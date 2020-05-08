@@ -9,18 +9,17 @@ from pydub.playback import play
 from datetime import datetime
 
 
-
 class RaspberryPi:
     def __init__(self, microphone=True, speakers=True):
         self.microphone = microphone
         self.speakers = speakers
 
     def play_sound(self, wav_file, save_png=False):
-        print("Playing audio...")        
+        print("Playing audio...")
         audio = AudioSegment.from_wav(wav_file)
         play(audio)
         if save_png:
-            wav_samples = np.array(audio.get_array_of_samples())        
+            wav_samples = np.array(audio.get_array_of_samples())
             fig1 = plt.plot(wav_samples)
 
             # save png with timestamp
@@ -29,7 +28,6 @@ class RaspberryPi:
             out_path = "output/fig_%s.png" % date_time
             plt.savefig(out_path)
             plt.clf()
-
 
     def record_sound(self, duration, fs=16000):
         # record voice for specified duration

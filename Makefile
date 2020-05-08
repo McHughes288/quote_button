@@ -1,7 +1,7 @@
 .DEFAULT_GOAL=all
 cov_dir:=htmlcov
 pytest_args:= -v --color=yes --junit-xml ut_results.xml --cov-report=html:$(cov_dir) --cov-report=term --disable-pytest-warnings
-includes="*.py"
+includes="."
 
 all: deps check
 

@@ -1,6 +1,8 @@
 sounddevice
 pydub
 playsound
+wave
+mutagen
 numpy
 jupyterlab
 black

@@ -14,5 +14,7 @@ source $VENV/bin/activate
 
 echo "Installing requirements..."
 # sudo apt install libblas-dev llvm python3-pip python3-scipy
-sudo apt-get install libportaudio2 libatlas-base-dev
+sudo apt-get install rclone libportaudio2 libatlas-base-dev
 pip3 install -r $ROOT_CLONE/requirements.txt
+
+$ROOT_CLONE/scripts/gdrive_sync.sh
