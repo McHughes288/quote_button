@@ -8,7 +8,7 @@ parser.add_argument(
     "--soundfile",
     "-s",
     action="store",
-    default="/home/pi/mnt/gdrive/Brian/bart_of_technology.wav",
+    default="/home/pi/mnt/gdrive/Brian/the_bart_of_technology.wav",
     dest="soundfile",
 )
 args = parser.parse_args()

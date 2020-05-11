@@ -1,5 +1,4 @@
 import os
-import time
 import librosa
 import numpy as np
 import sounddevice as sd
@@ -20,10 +19,10 @@ class RaspberryPi:
         play(audio)
         if save_png:
             wav_samples = np.array(audio.get_array_of_samples())
-            fig1 = plt.plot(wav_samples)
+            plt.plot(wav_samples)
 
             # save png with timestamp
-            os.makedirs("output", exist_ok=true)
+            os.makedirs("output", exist_ok=True)
             date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
             out_path = "output/fig_%s.png" % date_time
             plt.savefig(out_path)
@@ -36,10 +35,10 @@ class RaspberryPi:
         sd.wait()
 
         # save file with timestamp
-        print("Saving recording %s..." % rec_path)
-        os.makedirs("output", exist_ok=true)
+        os.makedirs("output", exist_ok=True)
         date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
         rec_path = "output/recording_%s.wav" % date_time
+        print("Saving recording %s..." % rec_path)
         librosa.output.write_wav(rec_path, myrecording, fs)
 
         return myrecording, rec_path

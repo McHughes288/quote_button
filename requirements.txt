@@ -1,6 +1,6 @@
 sounddevice
 pydub
-playsound
+pygame
 wave
 mutagen
 numpy
@@ -8,3 +8,5 @@ jupyterlab
 black
 flake8
 pylint
+picamera
+imutils
