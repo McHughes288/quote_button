@@ -10,6 +10,9 @@ sudo apt-get install python3-opencv libatlas-base-dev libjasper-dev libqtgui4 py
 sudo apt-get install python-rpi.gpio python3-rpi.gpio # gpio
 sudo apt-get libatlas-base-dev # microphone
 
+# git clone https://github.com/pimylifeup/Adafruit_Python_CharLCD.git $HOME/git
+# cd $HOME/git/Adafruit_Python_CharLCD && sudo python setup.py install
+
 if [ ! -d $VENV ]; then
 echo "Creating $VENV"
     pip install virtualenv
