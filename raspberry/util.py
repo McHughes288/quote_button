@@ -1,5 +1,6 @@
 import wave
 import mutagen.mp3
+import time
 
 def get_sample_rate(sound_file_path):
     type_of_file = sound_file_path.split(".")[-1]
@@ -41,10 +42,10 @@ def start_pwm(led_pins, GPIO):
     return pwm_pins
 
 
-def dim_leds(pwm_pins, level):
+def dim_leds(pwm_pins, level, wait=0.01):
     for p in pwm_pins:
         p.ChangeDutyCycle(level)
-    time.sleep(0.01)
+    time.sleep(wait)
 
 
 def stop_pwm(pwm_pins, GPIO):
