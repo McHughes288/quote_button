@@ -12,6 +12,10 @@ while True:
         # Detect button press
         if GPIO.input(button_pin) == GPIO.LOW:
             print(f"Button {button_name} (pin {button_pin}) was pushed!")
+
+            # LEDS on
+            for pin in pi.led_pins:
+                GPIO.output(pin, GPIO.HIGH)
             
             # update sounds available in gdrive and get the relevant ones
             pi.update_available_sounds()
@@ -27,3 +31,7 @@ while True:
 
             while GPIO.input(button_pin) == GPIO.LOW:
                 time.sleep(0.1)
+
+            # LEDs off
+            for pin in pi.led_pins:
+                GPIO.output(pin, GPIO.LOW)

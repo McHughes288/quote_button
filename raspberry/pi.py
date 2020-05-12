@@ -31,12 +31,19 @@ class RaspberryPi:
             "Random": [], 
             "Alert": []
         }
+
+        self.led_pins = [7, 11, 12, 16, 29, 31]
     
     def setup_gpio(self):
         GPIO.setmode(GPIO.BOARD)
         
+        # button pins
         for pin in self.button_name_to_pin.values():
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        
+        # LED pins
+        for pin in self.led_pins:
+            GPIO.setup(pin, GPIO.OUT)
 
         return GPIO
         
