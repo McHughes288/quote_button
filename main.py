@@ -13,11 +13,17 @@ camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
 
 flash_process = None
 wait_process = None
-# camera.detect_motion()
+
+# camera.start_camera()
 # camera.camera.close()
 
+print("Camera warming up...")
+time.sleep(camera.camera_warmup_time)
+
 try:
-    while True:
+    # capture frames from the camera
+    for f in camera.camera.capture_continuous(camera.rawCapture, format="bgr", use_video_port=True):
+        camera.detect_motion(f)
         # LED turn on in waves for "waiting" state
         if wait_process is None or not wait_process.is_alive():
             if flash_process is None or not flash_process.is_alive():
