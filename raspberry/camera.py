@@ -6,6 +6,7 @@ import json
 import time
 import cv2
 
+
 class Camera:
     def __init__(
         self,
@@ -14,9 +15,9 @@ class Camera:
         resolution=[640, 480],
         camera_warmup_time=1,
         delta_thresh=5,
-	    min_area=5000,
-	    min_alert_seconds=8.0,
-	    min_motion_frames=8,
+        min_area=5000,
+        min_alert_seconds=8.0,
+        min_motion_frames=8,
         greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav",
         save_image=True,
         save_image_location="/home/pi/mnt/gdrive/images",
@@ -50,7 +51,7 @@ class Camera:
         # resize the frame, convert it to grayscale, and blur it
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
-        
+
         # if the average frame is None, initialize it
         if self.avg is None:
             print("[CAMERA] starting background model...")
@@ -63,11 +64,13 @@ class Camera:
         return frameDelta
 
     def get_contours_from_delta(self, frameDelta):
-        
+
         # threshold the delta, dilate to fill in gaps and find contours
         thresh = cv2.threshold(frameDelta, self.delta_thresh, 255, cv2.THRESH_BINARY)[1]
         thresh = cv2.dilate(thresh, None, iterations=2)
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cv2.findContours(
+            thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
         cnts = imutils.grab_contours(cnts)
 
         return cnts
@@ -76,9 +79,9 @@ class Camera:
         motion_detected = False
         for c in cnts:
             if cv2.contourArea(c) > self.min_area:
-                motion_detected = True    
+                motion_detected = True
         return motion_detected
-       
+
     def customise_frame(self, frame, cnts, timestamp):
         # compute the bounding box for the contour
         for c in cnts:
@@ -117,7 +120,7 @@ class Camera:
             cv2.imwrite(image_path, frame)
 
     def decide_to_greet_person(self, motion_detected, timestamp, frame):
-        # play sound and save image if time between detections is large enough 
+        # play sound and save image if time between detections is large enough
         # and there is consistent motion
         greet = False
         if motion_detected:
@@ -136,7 +139,7 @@ class Camera:
 
     def detect_motion(self, f):
         timestamp = datetime.datetime.now()
-        
+
         frame = imutils.resize(f.array, width=500)
         frameDelta = self.get_diff_to_average(frame)
         contours = self.get_contours_from_delta(frameDelta)
@@ -151,13 +154,10 @@ class Camera:
         time.sleep(self.camera_warmup_time)
 
         # capture frames from the camera
-        for f in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
+        for f in self.camera.capture_continuous(
+            self.rawCapture, format="bgr", use_video_port=True
+        ):
             self.rawCapture.truncate(0)
             motion = self.detect_motion(f)
             if motion:
                 self.pi.play_sound(self.greeting_sound)
-            
-            
-
-
-

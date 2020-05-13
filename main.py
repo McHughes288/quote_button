@@ -33,22 +33,25 @@ try:
             if wait_process is None or not wait_process.is_alive():
                 wait_process = Process(target=pi.wave_leds, args=(0.1,))
                 wait_process.start()
-            
+
             # Take picture every 15 loops
             if loop_count % 10 == 0:
                 fps_times.append(time.time() - t_cam)
                 t_cam = time.time()
-                camera.camera.capture(camera.rawCapture, format="bgr", use_video_port=True)
+                camera.camera.capture(
+                    camera.rawCapture, format="bgr", use_video_port=True
+                )
                 camera.rawCapture.truncate(0)
                 motion = camera.detect_motion(camera.rawCapture)
                 if motion:
                     # Flash LEDs as background process and play greeting
                     wait_process.terminate()
-                    flash_process = Process(target=pi.flash_to_sound, args=(camera.greeting_sound,))
+                    flash_process = Process(
+                        target=pi.flash_to_sound, args=(camera.greeting_sound,)
+                    )
                     flash_process.start()
                     pi.play_sound(camera.greeting_sound)
 
-            
         # Detect button press for each button
         for button_name in pi.button_names:
             if pi.button_pressed(button_name):
@@ -65,16 +68,18 @@ try:
                 # update sounds available in gdrive and get the relevant ones
                 pi.update_available_sounds()
                 available_files = pi.button_name_to_files[button_name]
-                
+
                 # pick a random sound bite
                 if available_files:
-                    sound_file_path = random.choice(available_files)  
+                    sound_file_path = random.choice(available_files)
                 else:
                     sound_file_path = "/home/pi/mnt/gdrive/Brian/17.wav"
                 print(sound_file_path)
-                
+
                 # Flash LEDs as background process and play sound
-                flash_process = Process(target=pi.flash_to_sound, args=(sound_file_path,))
+                flash_process = Process(
+                    target=pi.flash_to_sound, args=(sound_file_path,)
+                )
                 flash_process.start()
                 pi.play_sound(sound_file_path)
 

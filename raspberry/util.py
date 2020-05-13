@@ -2,6 +2,7 @@ import wave
 import mutagen.mp3
 import time
 
+
 def get_sample_rate(sound_file_path):
     type_of_file = sound_file_path.split(".")[-1]
 
@@ -13,26 +14,6 @@ def get_sample_rate(sound_file_path):
         sampling_rate = file_wav.getframerate()
 
     return sampling_rate
-
-
-def flash_leds(led_pins, GPIO, repeat=4, length=0.6):
-    for _ in range(repeat):
-        for pin in led_pins:
-            GPIO.output(pin, GPIO.HIGH)
-        time.sleep(length)
-        for pin in led_pins:
-            GPIO.output(pin, GPIO.LOW)
-        time.sleep(length)
-
-
-def wave_leds(led_pins, GPIO, repeat=4, length=0.1):
-    for _ in range(repeat):
-        for pin in led_pins:
-            GPIO.output(pin, GPIO.HIGH)
-            time.sleep(length)
-        for pin in led_pins:
-            GPIO.output(pin, GPIO.LOW)
-            time.sleep(length)
 
 
 def start_pwm(led_pins, GPIO):

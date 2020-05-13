@@ -12,6 +12,7 @@ from scipy.io.wavfile import read
 import numpy as np
 import time
 
+
 class RaspberryPi:
     def __init__(self, microphone=False, speakers=True, camera=True):
         self.microphone = microphone
@@ -23,35 +24,35 @@ class RaspberryPi:
         self.button_names = ["Brian", "Mowbros", "Random", "Alert"]
 
         self.button_name_to_pin = {
-            "Brian": 38, 
-            "Mowbros": 32, 
-            "Random": 40, 
-            "Alert": 36
+            "Brian": 38,
+            "Mowbros": 32,
+            "Random": 40,
+            "Alert": 36,
         }
 
         self.button_name_to_files = {
-            "Brian": [], 
-            "Mowbros": [], 
-            "Random": [], 
-            "Alert": []
+            "Brian": [],
+            "Mowbros": [],
+            "Random": [],
+            "Alert": [],
         }
 
         self.led_pins = [7, 11, 12, 16, 29, 31]
-    
+
     def setup_gpio(self):
         self.GPIO.setmode(self.GPIO.BOARD)
         self.GPIO.setwarnings(False)
-        
+
         # button pins
         for pin in self.button_name_to_pin.values():
             self.GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        
+
         # LED pins
         for pin in self.led_pins:
             self.GPIO.setup(pin, GPIO.OUT)
 
         self.turn_leds_off()
-        
+
     def update_available_sounds(self):
         for name in self.button_name_to_files.keys():
             sound_file_paths = []
@@ -70,7 +71,7 @@ class RaspberryPi:
         if wait_to_finish:
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)
-    
+
     def button_pressed(self, button_name):
         button_pin = self.button_name_to_pin[button_name]
         return self.GPIO.input(button_pin) == self.GPIO.LOW
@@ -80,7 +81,7 @@ class RaspberryPi:
         sampling_rate = get_sample_rate(sound_file_path)
 
         sound = np.array(sound[1], dtype=float)
-        mono = sound[:,0] + sound[:,1] / 2.0
+        mono = sound[:, 0] + sound[:, 1] / 2.0
         loudness = abs(mono) / abs(mono).max()
 
         # downsample by max pooling over update_every chunks
@@ -96,7 +97,7 @@ class RaspberryPi:
             else:
                 self.turn_leds_off()
             time.sleep(update_every)
-        
+
         self.turn_leds_off()
 
     def turn_leds_on(self):
@@ -116,9 +117,6 @@ class RaspberryPi:
             for pin in self.led_pins:
                 self.GPIO.output(pin, self.GPIO.LOW)
                 time.sleep(length)
-
-
-
 
     # def play_recording(self, wav_file, save_png=False):
     #     print("Playing audio...")

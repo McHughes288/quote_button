@@ -23,5 +23,5 @@ lcd = characterlcd.Character_LCD_Mono(
 )
 lcd.backlight = True
 lcd.message = "Bello\nthere!"
-time.sleep(5)     
+time.sleep(5)
 lcd.clear()
