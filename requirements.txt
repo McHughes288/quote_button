@@ -4,10 +4,11 @@ pygame
 wave
 mutagen
 numpy
-jupyterlab
-black
-flake8
-pylint
 picamera
 imutils
 adafruit-circuitpython-charlcd
+jupyterlab
+matplotlib
+black
+flake8
+pylint

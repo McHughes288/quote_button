@@ -1,6 +1,4 @@
-# import os
 # import librosa
-# import numpy as np
 # import sounddevice as sd
 # import matplotlib.pyplot as plt
 # from pydub import AudioSegment
@@ -42,6 +40,7 @@ class RaspberryPi:
     
     def setup_gpio(self):
         self.GPIO.setmode(self.GPIO.BOARD)
+        self.GPIO.setwarnings(False)
         
         # button pins
         for pin in self.button_name_to_pin.values():
@@ -50,6 +49,8 @@ class RaspberryPi:
         # LED pins
         for pin in self.led_pins:
             self.GPIO.setup(pin, GPIO.OUT)
+
+        self.turn_leds_off()
         
     def update_available_sounds(self):
         for name in self.button_name_to_files.keys():
@@ -115,6 +116,7 @@ class RaspberryPi:
             for pin in self.led_pins:
                 self.GPIO.output(pin, self.GPIO.LOW)
                 time.sleep(length)
+
 
 
 

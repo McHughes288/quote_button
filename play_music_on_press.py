@@ -1,4 +1,5 @@
 from raspberry.pi import RaspberryPi
+from raspberry.camera import Camera
 import numpy as np
 import random
 import time
@@ -8,8 +9,12 @@ pi = RaspberryPi()
 pi.setup_gpio()
 pi.update_available_sounds()
 
+camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
+
 flash_process = None
 wait_process = None
+# camera.detect_motion()
+# camera.camera.close()
 
 try:
     while True:
@@ -53,3 +58,4 @@ try:
 except KeyboardInterrupt:
     pass
 pi.GPIO.cleanup()
+camera.camera.close()
