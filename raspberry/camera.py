@@ -15,7 +15,7 @@ class Camera:
         camera_warmup_time=1,
         delta_thresh=5,
 	    min_area=5000,
-	    min_alert_seconds=3.0,
+	    min_alert_seconds=8.0,
 	    min_motion_frames=8,
         greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav",
         save_image=True,
@@ -38,6 +38,10 @@ class Camera:
         self.camera.framerate = fps
         self.rawCapture = PiRGBArray(self.camera, size=tuple(resolution))
 
+        # initialize detection variables
+        self.reset_detection()
+
+    def reset_detection(self):
         self.avg = None
         self.last_detected = datetime.datetime.now()
         self.motionCounter = 0
@@ -49,7 +53,7 @@ class Camera:
         
         # if the average frame is None, initialize it
         if self.avg is None:
-            print("[INFO] starting background model...")
+            print("[CAMERA] starting background model...")
             self.avg = gray.copy().astype("float")
 
         # accumulate the weighted average and compute the difference
@@ -115,21 +119,23 @@ class Camera:
     def decide_to_greet_person(self, motion_detected, timestamp, frame):
         # play sound and save image if time between detections is large enough 
         # and there is consistent motion
+        greet = False
         if motion_detected:
             if (timestamp - self.last_detected).seconds >= self.min_alert_seconds:
                 self.motionCounter += 1
                 if self.motionCounter >= self.min_motion_frames:
-                    self.pi.play_sound(self.greeting_sound)
+                    print("[CAMERA] Greeting user and saving frame...")
+                    greet = True
                     self.save_frame(frame, timestamp)
                     # update timestamp and reset the motion counter
                     self.last_detected = timestamp
                     self.motionCounter = 0
         else:
             self.motionCounter = 0
+        return greet
 
     def detect_motion(self, f):
         timestamp = datetime.datetime.now()
-        self.rawCapture.truncate(0)
         
         frame = imutils.resize(f.array, width=500)
         frameDelta = self.get_diff_to_average(frame)
@@ -137,15 +143,19 @@ class Camera:
         frame = self.customise_frame(frame, contours, timestamp)
 
         motion_detected = self.infer_motion(contours)
-        self.decide_to_greet_person(motion_detected, timestamp, frame)
+        greet = self.decide_to_greet_person(motion_detected, timestamp, frame)
+        return greet
 
     def start_camera(self):
-        print("Camera warming up...")
+        print("[CAMERA] Camera warming up...")
         time.sleep(self.camera_warmup_time)
 
         # capture frames from the camera
         for f in self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True):
-            self.detect_motion(f)
+            self.rawCapture.truncate(0)
+            motion = self.detect_motion(f)
+            if motion:
+                self.pi.play_sound(self.greeting_sound)
             
             
 

@@ -14,27 +14,47 @@ camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
 flash_process = None
 wait_process = None
 
-# camera.start_camera()
-# camera.camera.close()
+loop_count = 0
+loop_times = []
+fps_times = []
+t_cam = time.time()
 
-print("Camera warming up...")
+print("[CAMERA] Camera warming up...")
 time.sleep(camera.camera_warmup_time)
 
 try:
-    # capture frames from the camera
-    for f in camera.camera.capture_continuous(camera.rawCapture, format="bgr", use_video_port=True):
-        camera.detect_motion(f)
-        # LED turn on in waves for "waiting" state
-        if wait_process is None or not wait_process.is_alive():
-            if flash_process is None or not flash_process.is_alive():
+    while 1:
+        t = time.time()
+
+        # If an audio clip isn't being played (hence the flash process)
+        if flash_process is None or not flash_process.is_alive():
+
+            # LED turn on in waves for "waiting" state
+            if wait_process is None or not wait_process.is_alive():
                 wait_process = Process(target=pi.wave_leds, args=(0.1,))
                 wait_process.start()
+            
+            # Take picture every 15 loops
+            if loop_count % 10 == 0:
+                fps_times.append(time.time() - t_cam)
+                t_cam = time.time()
+                camera.camera.capture(camera.rawCapture, format="bgr", use_video_port=True)
+                camera.rawCapture.truncate(0)
+                motion = camera.detect_motion(camera.rawCapture)
+                if motion:
+                    # Flash LEDs as background process and play greeting
+                    wait_process.terminate()
+                    flash_process = Process(target=pi.flash_to_sound, args=(camera.greeting_sound,))
+                    flash_process.start()
+                    pi.play_sound(camera.greeting_sound)
 
+            
+        # Detect button press for each button
         for button_name in pi.button_names:
-            # Detect button press
             if pi.button_pressed(button_name):
                 print(f"Button {button_name} was pushed!")
                 wait_process.terminate()
+                camera.reset_detection()
 
                 # Terminate flashing led process if running
                 if flash_process is not None and flash_process.is_alive():
@@ -61,7 +81,14 @@ try:
                 # if button still held, just wait
                 while pi.button_pressed(button_name):
                     time.sleep(0.05)
+
+        loop_times.append(time.time() - t)
+        loop_count = loop_count + 1
 except KeyboardInterrupt:
     pass
-pi.GPIO.cleanup()
-camera.camera.close()
+finally:
+    pi.turn_leds_off()
+    pi.GPIO.cleanup()
+    camera.camera.close()
+    print(f"Average loop time: {np.array(loop_times).mean():.6f}")
+    print(f"Average fps: {1/np.array(fps_times).mean():.2f}")
