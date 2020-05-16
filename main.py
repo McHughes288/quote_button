@@ -51,15 +51,13 @@ try:
                     wait_process.terminate()
                     if lcd_process is not None and lcd_process.is_alive():
                         lcd_process.terminate()
-                    
+
                     flash_process = Process(
                         target=pi.flash_to_sound, args=(camera.greeting_sound,)
                     )
                     flash_process.start()
 
-                    lcd_process = Process(
-                        target=lcd.scroll, args=("BELLO THERE!",)
-                    )
+                    lcd_process = Process(target=lcd.scroll, args=("BELLO THERE!",))
                     lcd_process.start()
 
                     pi.play_sound(camera.greeting_sound)
