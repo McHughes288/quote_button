@@ -11,18 +11,19 @@ pi.setup_gpio()
 pi.update_available_sounds()
 
 camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
-lcd = LCDScreen()
+print("[CAMERA] Camera warming up...")
+time.sleep(camera.camera_warmup_time)
+
+lcd = LCDScreen(waiting_message="BRESS ME\nPLEASE SIR")
 
 flash_process = None
 wait_process = None
+lcd_process = None
 
 loop_count = 0
 loop_times = []
 fps_times = []
 t_cam = time.time()
-
-print("[CAMERA] Camera warming up...")
-time.sleep(camera.camera_warmup_time)
 
 try:
     while 1:
@@ -48,12 +49,20 @@ try:
                 if motion:
                     # Flash LEDs as background process and play greeting
                     wait_process.terminate()
+                    if lcd_process is not None and lcd_process.is_alive():
+                        lcd_process.terminate()
+                    
                     flash_process = Process(
                         target=pi.flash_to_sound, args=(camera.greeting_sound,)
                     )
                     flash_process.start()
+
+                    lcd_process = Process(
+                        target=lcd.scroll, args=("BELLO THERE!",)
+                    )
+                    lcd_process.start()
+
                     pi.play_sound(camera.greeting_sound)
-                    lcd.display(camera.greeting_sound.split("/")[-1])
 
         # Detect button press for each button
         for button_name in pi.button_names:
@@ -67,6 +76,8 @@ try:
                     print("Terminating flash led process...")
                     flash_process.terminate()
                     pi.turn_leds_off()
+                if lcd_process is not None and lcd_process.is_alive():
+                    lcd_process.terminate()
 
                 # update sounds available in gdrive and get the relevant ones
                 pi.update_available_sounds()
@@ -79,13 +90,18 @@ try:
                     sound_file_path = "/home/pi/mnt/gdrive/Brian/17.wav"
                 print(sound_file_path)
 
-                # Flash LEDs as background process and play sound
+                # Flash LEDs in background
                 flash_process = Process(
                     target=pi.flash_to_sound, args=(sound_file_path,)
                 )
                 flash_process.start()
+                # Scroll LCD in background
+                lcd_process = Process(
+                    target=lcd.scroll, args=(sound_file_path.split("/")[-1],)
+                )
+                lcd_process.start()
+
                 pi.play_sound(sound_file_path)
-                lcd.display(sound_file_path.split("/")[-1])
 
                 # if button still held, just wait
                 while pi.button_pressed(button_name):
@@ -97,6 +113,7 @@ except KeyboardInterrupt:
     pass
 finally:
     pi.turn_leds_off()
+    lcd.turn_off()
     pi.GPIO.cleanup()
     camera.camera.close()
     print(f"Average loop time: {np.array(loop_times).mean():.6f}")

@@ -38,6 +38,7 @@ class RaspberryPi:
         }
 
         self.led_pins = [4, 17, 18, 23, 5, 6] #[7, 11, 12, 16, 29, 31]
+        self.led_pins = self.led_pins[::-1]
 
     def setup_gpio(self):
         self.GPIO.setmode(self.GPIO.BCM) # BOARD)

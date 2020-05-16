@@ -5,7 +5,7 @@ import time
 
 
 class LCDScreen:
-    def __init__(self, lcd_columns=16, lcd_rows=2):
+    def __init__(self, waiting_message="WAITING", lcd_columns=16, lcd_rows=2):
 
         # Raspberry Pi Pin Config:
         lcd_rs = digitalio.DigitalInOut(board.D26)
@@ -21,9 +21,14 @@ class LCDScreen:
         self.lcd = characterlcd.Character_LCD_Mono(
             lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_columns, lcd_rows, lcd_backlight
         )
+
+        self.lcd_columns = lcd_columns
+        self.lcd_rows = lcd_rows
+
+        self.waiting_message = waiting_message
         
         self.turn_on()
-        self.display("STARTING\nUP!")
+        self.display("BRESS ME\nPLEASE SIR")
     
     def turn_on(self):
         self.lcd.clear()
@@ -33,21 +38,28 @@ class LCDScreen:
         self.lcd.clear()
         self.lcd.backlight = False
 
-    def display(self, message, clear=True, scroll=False, t=None, blink=False):
-        print(message)
-        if self.lcd is not None:
-            if clear:
-                self.lcd.clear()
-            self.lcd.blink = blink
-            self.lcd.message = message
-            if scroll:
-                for i in range(len(message)):
-                    time.sleep(0.2)
+    def display(self, message, print_to_console=True):
+        if print_to_console:
+            print(message)
+        self.lcd.clear()
+        self.lcd.message = message
+
+    def scroll(self, message, repeat=2):
+        self.display(message)
+        if len(message) > self.lcd_columns:
+            for _ in range(repeat):
+                time.sleep(2)
+                for i in range(len(message)-self.lcd_columns):
                     self.lcd.move_left()
-                self.lcd.clear()
-                self.lcd.message = message
-            if t:
-                time.sleep(t)
+                    time.sleep(0.2)
+            
+                time.sleep(1)
+                self.display(message, print_to_console=False)
+        else:
+            time.sleep(4)
+            
+        time.sleep(2)
+        self.display(self.waiting_message)
 
 
     
