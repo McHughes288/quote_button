@@ -1,5 +1,6 @@
 from raspberry.pi import RaspberryPi
 from raspberry.camera import Camera
+from raspberry.lcd import LCDScreen
 import numpy as np
 import random
 import time
@@ -10,6 +11,7 @@ pi.setup_gpio()
 pi.update_available_sounds()
 
 camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
+lcd = LCDScreen()
 
 flash_process = None
 wait_process = None
@@ -51,6 +53,7 @@ try:
                     )
                     flash_process.start()
                     pi.play_sound(camera.greeting_sound)
+                    lcd.display(camera.greeting_sound.split("/")[-1])
 
         # Detect button press for each button
         for button_name in pi.button_names:
@@ -82,6 +85,7 @@ try:
                 )
                 flash_process.start()
                 pi.play_sound(sound_file_path)
+                lcd.display(sound_file_path.split("/")[-1])
 
                 # if button still held, just wait
                 while pi.button_pressed(button_name):

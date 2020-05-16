@@ -24,10 +24,10 @@ class RaspberryPi:
         self.button_names = ["Brian", "Mowbros", "Random", "Alert"]
 
         self.button_name_to_pin = {
-            "Brian": 38,
-            "Mowbros": 32,
-            "Random": 40,
-            "Alert": 36,
+            "Brian": 20, #38,
+            "Mowbros": 12, #32,
+            "Random": 21, #40,
+            "Alert": 16, #36,
         }
 
         self.button_name_to_files = {
@@ -37,10 +37,10 @@ class RaspberryPi:
             "Alert": [],
         }
 
-        self.led_pins = [7, 11, 12, 16, 29, 31]
+        self.led_pins = [4, 17, 18, 23, 5, 6] #[7, 11, 12, 16, 29, 31]
 
     def setup_gpio(self):
-        self.GPIO.setmode(self.GPIO.BOARD)
+        self.GPIO.setmode(self.GPIO.BCM) # BOARD)
         self.GPIO.setwarnings(False)
 
         # button pins
