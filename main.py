@@ -34,7 +34,7 @@ try:
 
             # LED turn on in waves for "waiting" state
             if wait_process is None or not wait_process.is_alive():
-                wait_process = Process(target=pi.wave_leds, args=(0.1,))
+                wait_process = Process(target=pi.leds.wave, args=(0.1,))
                 wait_process.start()
 
             # Take picture every 15 loops
@@ -53,7 +53,7 @@ try:
                         lcd_process.terminate()
 
                     flash_process = Process(
-                        target=pi.flash_to_sound, args=(camera.greeting_sound,)
+                        target=pi.leds.flash_to_sound, args=(camera.greeting_sound,)
                     )
                     flash_process.start()
 
@@ -73,7 +73,7 @@ try:
                 if flash_process is not None and flash_process.is_alive():
                     print("Terminating flash led process...")
                     flash_process.terminate()
-                    pi.turn_leds_off()
+                    pi.leds.turn_off()
                 if lcd_process is not None and lcd_process.is_alive():
                     lcd_process.terminate()
 
@@ -89,7 +89,7 @@ try:
 
                 # Flash LEDs in background
                 flash_process = Process(
-                    target=pi.flash_to_sound, args=(sound_file_path,)
+                    target=pi.leds.flash_to_sound, args=(sound_file_path,)
                 )
                 flash_process.start()
                 # Scroll LCD in background
@@ -109,7 +109,7 @@ try:
 except KeyboardInterrupt:
     pass
 finally:
-    pi.turn_leds_off()
+    pi.leds.turn_off()
     lcd.turn_off()
     pi.GPIO.cleanup()
     camera.camera.close()

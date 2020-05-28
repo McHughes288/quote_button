@@ -8,16 +8,12 @@ import pygame
 import RPi.GPIO as GPIO
 import os
 from raspberry.util import get_sample_rate
-from scipy.io.wavfile import read
-import numpy as np
+from raspberry.led import LEDArray
 import time
 
 
 class RaspberryPi:
-    def __init__(self, microphone=False, speakers=True, camera=True):
-        self.microphone = microphone
-        self.speakers = speakers
-        self.camera = camera
+    def __init__(self):
 
         self.GPIO = GPIO
 
@@ -30,8 +26,9 @@ class RaspberryPi:
             "Alert": 16,  # 36,
         }
 
-        self.led_pins = [4, 17, 18, 23, 5, 6]  # [7, 11, 12, 16, 29, 31]
-        self.led_pins = self.led_pins[::-1]
+        led_pins = [4, 17, 18, 23, 5, 6]  # [7, 11, 12, 16, 29, 31]
+        led_pins = led_pins[::-1]
+        self.leds = LEDArray(led_pins)
 
     def setup_gpio(self):
         self.GPIO.setmode(self.GPIO.BCM)  # BOARD)
@@ -41,11 +38,7 @@ class RaspberryPi:
         for pin in self.button_name_to_pin.values():
             self.GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-        # LED pins
-        for pin in self.led_pins:
-            self.GPIO.setup(pin, GPIO.OUT)
-
-        self.turn_leds_off()
+        self.leds.setup()
 
     def play_sound(self, sound_file_path, wait_to_finish=False):
         sampling_rate = get_sample_rate(sound_file_path)
@@ -62,47 +55,7 @@ class RaspberryPi:
         button_pin = self.button_name_to_pin[button_name]
         return self.GPIO.input(button_pin) == self.GPIO.LOW
 
-    def flash_to_sound(self, sound_file_path, update_every=0.01):
-        sound = read(sound_file_path)
-        sampling_rate = get_sample_rate(sound_file_path)
 
-        sound = np.array(sound[1], dtype=float)
-        mono = sound[:, 0] + sound[:, 1] / 2.0
-        loudness = abs(mono) / abs(mono).max()
-
-        # downsample by max pooling over update_every chunks
-        remainder = int(loudness.shape[0] % (sampling_rate * update_every))
-        loudness = loudness[0:-remainder]
-        loudness = loudness.reshape(-1, int(sampling_rate * update_every))
-        loudness = np.max(loudness, 1)
-
-        # LEDs on if over a volume threshold
-        for level in loudness:
-            if level > 0.6:
-                self.turn_leds_on()
-            else:
-                self.turn_leds_off()
-            time.sleep(update_every)
-
-        self.turn_leds_off()
-
-    def turn_leds_on(self):
-        for pin in self.led_pins:
-            self.GPIO.output(pin, self.GPIO.HIGH)
-
-    def turn_leds_off(self):
-        for pin in self.led_pins:
-            self.GPIO.output(pin, self.GPIO.LOW)
-
-    def wave_leds(self, length):
-        time.sleep(1)
-        while 1:
-            for pin in self.led_pins:
-                self.GPIO.output(pin, self.GPIO.HIGH)
-                time.sleep(length)
-            for pin in self.led_pins:
-                self.GPIO.output(pin, self.GPIO.LOW)
-                time.sleep(length)
 
     # def play_recording(self, wav_file, save_png=False):
     #     print("Playing audio...")
