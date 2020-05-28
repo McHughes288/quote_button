@@ -30,13 +30,6 @@ class RaspberryPi:
             "Alert": 16,  # 36,
         }
 
-        self.button_name_to_files = {
-            "Brian": [],
-            "Mowbros": [],
-            "Random": [],
-            "Alert": [],
-        }
-
         self.led_pins = [4, 17, 18, 23, 5, 6]  # [7, 11, 12, 16, 29, 31]
         self.led_pins = self.led_pins[::-1]
 
@@ -53,14 +46,6 @@ class RaspberryPi:
             self.GPIO.setup(pin, GPIO.OUT)
 
         self.turn_leds_off()
-
-    def update_available_sounds(self):
-        for name in self.button_name_to_files.keys():
-            sound_file_paths = []
-            folder_path = f"/home/pi/mnt/gdrive/{name}"
-            for (dirpath, dirnames, filenames) in os.walk(folder_path):
-                sound_file_paths.extend([f"{dirpath}/{name}" for name in filenames])
-            self.button_name_to_files[name] = sound_file_paths
 
     def play_sound(self, sound_file_path, wait_to_finish=False):
         sampling_rate = get_sample_rate(sound_file_path)

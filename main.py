@@ -1,6 +1,7 @@
 from raspberry.pi import RaspberryPi
 from raspberry.camera import Camera
 from raspberry.lcd import LCDScreen
+from raspberry.util import get_available_sounds
 import numpy as np
 import random
 import time
@@ -8,7 +9,6 @@ from multiprocessing import Process
 
 pi = RaspberryPi()
 pi.setup_gpio()
-pi.update_available_sounds()
 
 camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
 print("[CAMERA] Camera warming up...")
@@ -77,9 +77,8 @@ try:
                 if lcd_process is not None and lcd_process.is_alive():
                     lcd_process.terminate()
 
-                # update sounds available in gdrive and get the relevant ones
-                pi.update_available_sounds()
-                available_files = pi.button_name_to_files[button_name]
+                # get sounds available in gdrive for relevant button
+                available_files = get_available_sounds(button_name)
 
                 # pick a random sound bite
                 if available_files:
