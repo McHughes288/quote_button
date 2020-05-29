@@ -9,44 +9,38 @@ import RPi.GPIO as GPIO
 import os
 from raspberry.util import get_sample_rate
 from raspberry.led import LEDArray
+from raspberry.button import ButtonArray
 import time
 
 
 class RaspberryPi:
     def __init__(self):
 
-        self.GPIO = GPIO
+        button_names = ["Brian", "Mowbros", "Random", "Alert"]
 
-        self.button_names = ["Brian", "Mowbros", "Random", "Alert"]
-
-        self.button_name_to_pin = {
+        button_name_to_pin = {
             "Brian": 20,  # 38,
             "Mowbros": 12,  # 32,
             "Random": 21,  # 40,
             "Alert": 16,  # 36,
         }
+        self.buttons = ButtonArray(button_names, button_name_to_pin)
 
         led_pins = [4, 17, 18, 23, 5, 6]  # [7, 11, 12, 16, 29, 31]
         led_pins = led_pins[::-1]
         self.leds = LEDArray(led_pins)
 
     def setup_gpio(self):
-        self.GPIO.setmode(self.GPIO.BCM)  # BOARD)
-        self.GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)  # BOARD)
+        GPIO.setwarnings(False)
 
-        # button pins
-        for pin in self.button_name_to_pin.values():
-            self.GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
+        self.buttons.setup()
         self.leds.setup()
 
-    def button_pressed(self, button_name):
-        button_pin = self.button_name_to_pin[button_name]
-        return self.GPIO.input(button_pin) == self.GPIO.LOW
 
     def terminate(self):
         self.leds.turn_off()
-        self.GPIO.cleanup()
+        GPIO.cleanup()
 
 
 

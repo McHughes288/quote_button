@@ -60,8 +60,8 @@ try:
                     play_sound(camera.greeting_sound)
 
         # Detect button press for each button
-        for button_name in pi.button_names:
-            if pi.button_pressed(button_name):
+        for button_name in pi.buttons.names:
+            if pi.buttons.pressed(button_name):
                 print(f"Button {button_name} was pushed!")
                 wait_process.terminate()
                 camera.reset_detection()
@@ -98,7 +98,7 @@ try:
                 play_sound(sound_file_path)
 
                 # if button still held, just wait
-                while pi.button_pressed(button_name):
+                while pi.buttons.pressed(button_name):
                     time.sleep(0.05)
 
         loop_times.append(time.time() - t)
