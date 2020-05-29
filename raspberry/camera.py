@@ -2,7 +2,6 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 import datetime
 import imutils
-import json
 import time
 import cv2
 from raspberry.util import play_sound

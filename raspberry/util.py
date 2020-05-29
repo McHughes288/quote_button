@@ -1,6 +1,5 @@
 import wave
 import mutagen.mp3
-import time
 import os
 import pygame
 
@@ -29,8 +28,9 @@ def play_sound(sound_file_path, wait_to_finish=False):
         while pygame.mixer.music.get_busy():
             pygame.time.Clock().tick(10)
 
+
 def get_available_sounds(button_name, gdrive_path="/home/pi/mnt/gdrive"):
-    """ 
+    """
     Input: button_name - must match one of teh folders in the google drive
     Output: list of files in that directory
     """
@@ -39,4 +39,3 @@ def get_available_sounds(button_name, gdrive_path="/home/pi/mnt/gdrive"):
     for (dirpath, dirnames, filenames) in os.walk(folder_path):
         sound_file_paths.extend([f"{dirpath}/{name}" for name in filenames])
     return sound_file_paths
-

@@ -13,7 +13,7 @@ class LEDArray:
         # LED pins
         for pin in self.led_pins:
             GPIO.setup(pin, GPIO.OUT)
-        
+
         self.pwm_pins = [GPIO.PWM(pin, 100) for pin in self.led_pins]
         self.turn_off()
 
@@ -58,8 +58,8 @@ class LEDArray:
             for pin in self.led_pins:
                 GPIO.output(pin, GPIO.LOW)
                 time.sleep(length)
-            
-    def pulse(pwm_pins, level, wait=0.01):
+
+    def pulse(self, pwm_pins, level, wait=0.01):
         for p in self.pwm_pins:
             p.start(0)
         while 1:
@@ -73,7 +73,7 @@ class LEDArray:
                     p.ChangeDutyCycle(x)
                 time.sleep(wait)
 
-    def stop_pulse(pwm_pins, GPIO):
+    def stop_pulse(self, pwm_pins, GPIO):
         for p in self.pwm_pins:
             p.stop()
         GPIO.cleanup()

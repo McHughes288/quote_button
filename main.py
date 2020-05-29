@@ -1,6 +1,7 @@
 from raspberry.pi import RaspberryPi
 from raspberry.camera import Camera
 from raspberry.lcd import LCDScreen
+from raspberry.microphone import Microphone
 from raspberry.util import get_available_sounds, play_sound
 import numpy as np
 import random
@@ -12,6 +13,7 @@ pi.setup_gpio()
 
 camera = Camera(greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
 lcd = LCDScreen(waiting_message="BRESS ME\nPLEASE SIR")
+mic = Microphone(lcd)
 
 flash_process = None
 wait_process = None
@@ -62,9 +64,25 @@ try:
         # Detect button press for each button
         for button_name in pi.buttons.names:
             if pi.buttons.pressed(button_name):
-                print(f"Button {button_name} was pushed!")
+
                 wait_process.terminate()
                 camera.reset_detection()
+                pi.leds.turn_on()
+
+                # if button still held, just wait
+                # record and play if over 3 seconds
+                total_time = 0
+                while pi.buttons.pressed(button_name):
+                    total_time += 0.05
+                    time.sleep(0.05)
+
+                    if total_time > 3:
+                        mic.record_sound(5)
+                        break
+                if total_time > 3:
+                    break
+
+                print(f"Button {button_name} was pushed!")
 
                 # Terminate flashing led process if running
                 if flash_process is not None and flash_process.is_alive():
@@ -96,10 +114,6 @@ try:
                 lcd_process.start()
 
                 play_sound(sound_file_path)
-
-                # if button still held, just wait
-                while pi.buttons.pressed(button_name):
-                    time.sleep(0.05)
 
         loop_times.append(time.time() - t)
         loop_count = loop_count + 1
