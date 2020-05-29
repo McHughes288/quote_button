@@ -2,6 +2,7 @@ import wave
 import mutagen.mp3
 import time
 import os
+import pygame
 
 
 def get_sample_rate(sound_file_path):
@@ -16,6 +17,17 @@ def get_sample_rate(sound_file_path):
 
     return sampling_rate
 
+
+def play_sound(sound_file_path, wait_to_finish=False):
+    sampling_rate = get_sample_rate(sound_file_path)
+
+    pygame.mixer.init(frequency=sampling_rate)
+    pygame.mixer.music.load(sound_file_path)
+    pygame.mixer.music.play()
+
+    if wait_to_finish:
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
 
 def get_available_sounds(button_name, gdrive_path="/home/pi/mnt/gdrive"):
     """ 

@@ -1,7 +1,7 @@
 from raspberry.pi import RaspberryPi
 from raspberry.camera import Camera
 from raspberry.lcd import LCDScreen
-from raspberry.util import get_available_sounds
+from raspberry.util import get_available_sounds, play_sound
 import numpy as np
 import random
 import time
@@ -10,10 +10,7 @@ from multiprocessing import Process
 pi = RaspberryPi()
 pi.setup_gpio()
 
-camera = Camera(pi, greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
-print("[CAMERA] Camera warming up...")
-time.sleep(camera.camera_warmup_time)
-
+camera = Camera(greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
 lcd = LCDScreen(waiting_message="BRESS ME\nPLEASE SIR")
 
 flash_process = None
@@ -60,7 +57,7 @@ try:
                     lcd_process = Process(target=lcd.scroll, args=("BELLO THERE!",))
                     lcd_process.start()
 
-                    pi.play_sound(camera.greeting_sound)
+                    play_sound(camera.greeting_sound)
 
         # Detect button press for each button
         for button_name in pi.button_names:
@@ -98,7 +95,7 @@ try:
                 )
                 lcd_process.start()
 
-                pi.play_sound(sound_file_path)
+                play_sound(sound_file_path)
 
                 # if button still held, just wait
                 while pi.button_pressed(button_name):
@@ -109,9 +106,8 @@ try:
 except KeyboardInterrupt:
     pass
 finally:
-    pi.leds.turn_off()
     lcd.turn_off()
-    pi.GPIO.cleanup()
     camera.camera.close()
+    pi.terminate()
     print(f"Average loop time: {np.array(loop_times).mean():.6f}")
     print(f"Average fps: {1/np.array(fps_times).mean():.2f}")

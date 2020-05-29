@@ -5,12 +5,12 @@ import imutils
 import json
 import time
 import cv2
+from raspberry.util import play_sound
 
 
 class Camera:
     def __init__(
         self,
-        pi,
         fps=16,
         resolution=[640, 480],
         camera_warmup_time=1,
@@ -23,7 +23,6 @@ class Camera:
         save_image_location="/home/pi/mnt/gdrive/images",
     ):
 
-        self.pi = pi
         self.camera_warmup_time = camera_warmup_time
         self.delta_thresh = delta_thresh
         self.min_area = min_area
@@ -41,6 +40,10 @@ class Camera:
 
         # initialize detection variables
         self.reset_detection()
+
+        # wait warm up time
+        print("[CAMERA] Camera warming up...")
+        time.sleep(self.camera_warmup_time)
 
     def reset_detection(self):
         self.avg = None
@@ -160,4 +163,4 @@ class Camera:
             self.rawCapture.truncate(0)
             motion = self.detect_motion(f)
             if motion:
-                self.pi.play_sound(self.greeting_sound)
+                play_sound(self.greeting_sound)

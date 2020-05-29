@@ -4,7 +4,7 @@
 # from pydub import AudioSegment
 # from pydub.playback import play
 # from datetime import datetime
-import pygame
+
 import RPi.GPIO as GPIO
 import os
 from raspberry.util import get_sample_rate
@@ -40,20 +40,13 @@ class RaspberryPi:
 
         self.leds.setup()
 
-    def play_sound(self, sound_file_path, wait_to_finish=False):
-        sampling_rate = get_sample_rate(sound_file_path)
-
-        pygame.mixer.init(frequency=sampling_rate)
-        pygame.mixer.music.load(sound_file_path)
-        pygame.mixer.music.play()
-
-        if wait_to_finish:
-            while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
-
     def button_pressed(self, button_name):
         button_pin = self.button_name_to_pin[button_name]
         return self.GPIO.input(button_pin) == self.GPIO.LOW
+
+    def terminate(self):
+        self.leds.turn_off()
+        self.GPIO.cleanup()
 
 
 
