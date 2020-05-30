@@ -2,6 +2,8 @@ import wave
 import mutagen.mp3
 import os
 import pygame
+import numpy as np
+from scipy.stats import norm
 
 
 def get_sample_rate(sound_file_path):
@@ -39,3 +41,10 @@ def get_available_sounds(button_name, gdrive_path="/home/pi/mnt/gdrive"):
     for (dirpath, dirnames, filenames) in os.walk(folder_path):
         sound_file_paths.extend([f"{dirpath}/{name}" for name in filenames])
     return sound_file_paths
+
+
+def gaussian_smooth(x_abs, nsig=3, kernlen=1000):
+    x = np.linspace(-nsig, nsig, kernlen + 1)
+    kern = np.diff(norm.cdf(x))
+    x_smooth = np.convolve(x_abs, kern, mode="same")
+    return x_smooth / x_smooth.max()

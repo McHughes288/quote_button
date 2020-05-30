@@ -1,56 +1,56 @@
 import sounddevice as sd
 import time
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+from scipy.io.wavfile import write
+from raspberry.util import gaussian_smooth
 
 
 class Microphone:
-    def __init__(self, lcd):
+    def __init__(
+        self, lcd, sampling_rate=16000, save_location="/home/pi/mnt/gdrive/recordings"
+    ):
         self.lcd = lcd
+        self.save_location = save_location
+        self.sampling_rate = sampling_rate
 
-    def record_sound(self, duration, fs=16000):
+    def record_sound(self, duration, playback=True, save_wav=True):
         self.lcd.display("About to\nrecord...")
         time.sleep(2)
 
         # record voice for specified duration
         self.lcd.display("Recording\nsound...")
-        myrecording = sd.rec(duration * fs, samplerate=fs, channels=1, dtype="float32")
+        samples = self.sampling_rate * duration
+        myrecording = sd.rec(
+            samples, samplerate=self.sampling_rate, channels=1, dtype="float32"
+        )
         sd.wait()
 
-        self.lcd.display("Playing\nrecording...")
-        sd.play(myrecording, fs)
-        sd.wait()
+        if save_wav:
+            self.save_recording(myrecording)
 
-        self.lcd.display("BRESS ME\nPLEASE SIR")
+        if playback:
+            self.lcd.display("Playing\nrecording...")
+            sd.play(myrecording, self.sampling_rate)
+            sd.wait()
 
-    def listen_for_rage():
-        pass
+        self.lcd.display(self.lcd.waiting_message)
 
-        # # save file with timestamp
-        # os.makedirs("output", exist_ok=True)
-        # date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-        # rec_path = "output/recording_%s.wav" % date_time
-        # print("Saving recording %s..." % rec_path)
-        # librosa.output.write_wav(rec_path, myrecording, fs)
+    def save_recording(self, recording):
+        recording = np.squeeze(recording)
+        date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
-        # return myrecording, rec_path
+        out_wav = f"{self.save_location}/{date_time}.wav"
+        write(out_wav, self.sampling_rate, recording)
 
+        out_fig = f"{self.save_location}/{date_time}.png"
+        plt.plot(recording)
+        plt.savefig(out_fig)
+        plt.clf()
 
-# import librosa
-# import sounddevice as sd
-# import matplotlib.pyplot as plt
-# from pydub import AudioSegment
-# from pydub.playback import play
-# from datetime import datetime
-# def play_recording(self, wav_file, save_png=False):
-#     print("Playing audio...")
-#     audio = AudioSegment.from_wav(wav_file)
-#     play(audio)
-#     if save_png:
-#         wav_samples = np.array(audio.get_array_of_samples())
-#         plt.plot(wav_samples)
-
-#         # save png with timestamp
-#         os.makedirs("output", exist_ok=True)
-#         date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-#         out_path = "output/fig_%s.png" % date_time
-#         plt.savefig(out_path)
-#         plt.clf()
+    def rage_present(x):
+        x = np.squeeze(x).abs()
+        x = gaussian_smooth(x)
+        if x.max() > 0.4:
+            return True
