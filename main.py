@@ -11,7 +11,7 @@ from multiprocessing import Process
 pi = RaspberryPi()
 pi.setup_gpio()
 
-camera = Camera(greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
+camera = Camera(greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav", min_alert_seconds=60)
 lcd = LCDScreen(waiting_message="BRESS ME\nPLEASE SIR")
 mic = Microphone(lcd, volume_threshold=0.3)
 
@@ -28,13 +28,14 @@ t_cam = time.time()
 try:
     while 1:
         t = time.time()
-        # If volume is not running
-        if volume_process is None or not volume_process.is_alive():
-            volume_process = Process(target=mic.background_volume, args=(5,))
-            volume_process.start()
 
         # If an audio clip isn't being played (hence the flash process)
         if flash_process is None or not flash_process.is_alive():
+
+            # If volume is not running
+            if volume_process is None or not volume_process.is_alive():
+                volume_process = Process(target=mic.background_volume, args=(5,))
+                volume_process.start()
 
             # LED turn on in waves for "waiting" state
             if wait_process is None or not wait_process.is_alive():
@@ -79,18 +80,25 @@ try:
 
                 wait_process.terminate()
                 camera.reset_detection()
-                pi.leds.turn_on()
 
                 # if button still held, just wait
                 # record and play if over 3 seconds
                 total_time = 0
+                level = 0
+                pi.leds.turn_off()
+                pi.leds.start_pwm()
                 while pi.buttons.pressed(button_name):
                     total_time += 0.05
                     time.sleep(0.05)
 
+                    pi.leds.set_brightness(level)
+                    level = level + (100 * 0.05 / 3)
+
                     if total_time > 3:
                         mic.button_held_to_record(5)
                         break
+                pi.leds.stop_pwm()
+                pi.leds.turn_on()
                 if total_time > 3:
                     break
 
