@@ -47,4 +47,4 @@ def gaussian_smooth(x_abs, nsig=3, kernlen=1000):
     x = np.linspace(-nsig, nsig, kernlen + 1)
     kern = np.diff(norm.cdf(x))
     x_smooth = np.convolve(x_abs, kern, mode="same")
-    return x_smooth / x_smooth.max()
+    return x_smooth

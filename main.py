@@ -13,11 +13,12 @@ pi.setup_gpio()
 
 camera = Camera(greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav")
 lcd = LCDScreen(waiting_message="BRESS ME\nPLEASE SIR")
-mic = Microphone(lcd)
+mic = Microphone(lcd, volume_threshold=0.3)
 
 flash_process = None
 wait_process = None
 lcd_process = None
+volume_process = None
 
 loop_count = 0
 loop_times = []
@@ -27,6 +28,10 @@ t_cam = time.time()
 try:
     while 1:
         t = time.time()
+        # If volume is not running
+        if volume_process is None or not volume_process.is_alive():
+            volume_process = Process(target=mic.background_volume, args=(5,))
+            volume_process.start()
 
         # If an audio clip isn't being played (hence the flash process)
         if flash_process is None or not flash_process.is_alive():
@@ -46,6 +51,9 @@ try:
                 camera.rawCapture.truncate(0)
                 motion = camera.detect_motion(camera.rawCapture)
                 if motion:
+                    # kill the mic recording process
+                    if volume_process.is_alive():
+                        volume_process.terminate()
                     # Flash LEDs as background process and play greeting
                     wait_process.terminate()
                     if lcd_process is not None and lcd_process.is_alive():
@@ -65,6 +73,10 @@ try:
         for button_name in pi.buttons.names:
             if pi.buttons.pressed(button_name):
 
+                # kill the mic recording process
+                if volume_process.is_alive():
+                    volume_process.terminate()
+
                 wait_process.terminate()
                 camera.reset_detection()
                 pi.leds.turn_on()
@@ -77,7 +89,7 @@ try:
                     time.sleep(0.05)
 
                     if total_time > 3:
-                        mic.record_sound(5)
+                        mic.button_held_to_record(5)
                         break
                 if total_time > 3:
                     break
