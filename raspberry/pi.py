@@ -9,19 +9,40 @@ class RaspberryPi:
         button_names = ["TV", "Films", "Memes", "recordings"]
 
         button_name_to_pin = {
-            "TV": 20,  # 38,
-            "Films": 12,  # 32,
-            "recordings": 21,  # 40,
-            "Memes": 16,  # 36,
+            "TV": 20,
+            "Films": 12,
+            "recordings": 21,
+            "Memes": 16,
         }
         self.buttons = ButtonArray(button_names, button_name_to_pin)
 
-        led_pins = [4, 17, 18, 23, 5, 6]  # [7, 11, 12, 16, 29, 31]
+        led_pins = [4, 17, 18, 23, 5, 6]
         led_pins = led_pins[::-1]
         self.leds = LEDArray(led_pins)
 
     def setup_gpio(self):
-        GPIO.setmode(GPIO.BCM)  # BOARD)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+
+        self.buttons.setup()
+        self.leds.setup()
+
+    def terminate(self):
+        self.leds.turn_off()
+        GPIO.cleanup()
+
+class RaspberryPiZero:
+    def __init__(self):
+
+        button_names = ["Sounds"]
+        button_name_to_pin = {"Sounds": 23}
+        self.buttons = ButtonArray(button_names, button_name_to_pin)
+
+        led_pins = [26]
+        self.leds = LEDArray(led_pins)
+
+    def setup_gpio(self):
+        GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
 
         self.buttons.setup()

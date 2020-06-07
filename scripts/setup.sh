@@ -5,17 +5,18 @@ ROOT_CLONE=$HOME/git/quote_button
 
 echo "Installing system requirements..."
 # sudo apt install libblas-dev llvm python3-pip python3-scipy
-sudo apt-get install rclone # google drive
-sudo apt-get install python3-opencv libatlas-base-dev libjasper-dev libqtgui4 python3-pyqt5 # open cv
-sudo apt-get install python-rpi.gpio python3-rpi.gpio # gpio
-sudo apt-get libatlas-base-dev # microphone
+sudo apt-get -y install rclone # google drive
+sudo apt-get -y install python3-opencv libatlas-base-dev libjasper-dev libqtgui4 python3-pyqt5 # open cv
+sudo apt-get -y install python-rpi.gpio python3-rpi.gpio # gpio
+sudo apt-get -y install libatlas-base-dev # microphone
+sudo apt-get -y install python3-pip mplayer
 
 # git clone https://github.com/pimylifeup/Adafruit_Python_CharLCD.git $HOME/git
 # cd $HOME/git/Adafruit_Python_CharLCD && sudo python setup.py install
 
 if [ ! -d $VENV ]; then
 echo "Creating $VENV"
-    pip install virtualenv
+    pip3 install virtualenv
     virtualenv --system-site-packages -p python3 $VENV
 fi
 
