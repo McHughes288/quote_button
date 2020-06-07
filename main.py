@@ -11,7 +11,7 @@ from multiprocessing import Process
 pi = RaspberryPi()
 pi.setup_gpio()
 
-camera = Camera(greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav", min_alert_seconds=60)
+camera = Camera(greeting_sound="/home/pi/mnt/gdrive/TV/brian_badonde/17.wav", min_alert_seconds=60)
 lcd = LCDScreen(waiting_message="BRESS ME\nPLEASE SIR")
 mic = Microphone(lcd, volume_threshold=0.3)
 
@@ -119,7 +119,7 @@ try:
                 if available_files:
                     sound_file_path = random.choice(available_files)
                 else:
-                    sound_file_path = "/home/pi/mnt/gdrive/Brian/17.wav"
+                    sound_file_path = "/home/pi/mnt/gdrive/TV/brian_badonde/17.wav"
                 print(sound_file_path)
 
                 # Flash LEDs in background

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 from scipy.io.wavfile import write
-from raspberry.util import gaussian_smooth
+from raspberry.util import gaussian_smooth, wav_to_float
 
 
 class Microphone:
@@ -43,7 +43,7 @@ class Microphone:
     def record_sound(self, duration):
         samples = self.sampling_rate * duration
         myrecording = sd.rec(
-            samples, samplerate=self.sampling_rate, channels=1, dtype="float32"
+            samples, samplerate=self.sampling_rate, channels=1, dtype="int16"
         )
         sd.wait()
         return myrecording
@@ -52,17 +52,18 @@ class Microphone:
         sd.play(myrecording, self.sampling_rate)
         sd.wait()
 
-    def save_recording(self, recording):
+    def save_recording(self, recording, save_png=False):
         recording = np.squeeze(recording)
         date_time = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
         out_wav = f"{self.save_location}/{date_time}.wav"
         write(out_wav, self.sampling_rate, recording)
 
-        out_fig = f"{self.save_location}/{date_time}.png"
-        plt.plot(recording)
-        plt.savefig(out_fig)
-        plt.clf()
+        if save_png:
+            out_fig = f"{self.save_location}/{date_time}.png"
+            plt.plot(recording)
+            plt.savefig(out_fig)
+            plt.clf()
 
     def get_volume(self, x):
-        return gaussian_smooth(np.abs(np.squeeze(x)))
+        return gaussian_smooth(np.abs(np.squeeze(wav_to_float(x))))

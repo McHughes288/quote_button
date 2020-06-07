@@ -8,6 +8,8 @@
 
 LOCAL_GDRIVE=$HOME/mnt/gdrive
 
+cp $HOME/rclone_config_saved $HOME/.config/rclone/rclone.conf
+
 # Create directories
 if [ ! -d $LOCAL_GDRIVE ]; then
     mkdir -p $LOCAL_GDRIVE

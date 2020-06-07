@@ -21,13 +21,21 @@ class LEDArray:
         sound = read(sound_file_path)
         sampling_rate = get_sample_rate(sound_file_path)
 
+        if sampling_rate == 16000:
+            update_every = update_every * 4
+            time.sleep(1)
+        else:
+            time.sleep(0.2)
+
         sound = np.array(sound[1], dtype=float)
-        mono = sound[:, 0] + sound[:, 1] / 2.0
-        loudness = abs(mono) / abs(mono).max()
+        if len(sound.shape) == 2:
+            sound = sound[:, 0] + sound[:, 1] / 2.0
+        loudness = abs(sound) / abs(sound).max()
 
         # downsample by max pooling over update_every chunks
         remainder = int(loudness.shape[0] % (sampling_rate * update_every))
-        loudness = loudness[0:-remainder]
+        if remainder > 0:
+            loudness = loudness[0:-remainder]
         loudness = loudness.reshape(-1, int(sampling_rate * update_every))
         loudness = np.max(loudness, 1)
 
@@ -40,6 +48,7 @@ class LEDArray:
             time.sleep(update_every)
 
         self.turn_off()
+        time.sleep(0.5)
 
     def turn_on(self):
         for pin in self.led_pins:

@@ -19,8 +19,11 @@ if type_of_file == "mp3":
     mp3 = mutagen.mp3.MP3(args.soundfile)
     sampling_rate = mp3.info.sample_rate
 elif type_of_file == "wav":
-    file_wav = wave.open(args.soundfile)
-    sampling_rate = file_wav.getframerate()
+    try:
+        file_wav = wave.open(args.soundfile)
+        sampling_rate = file_wav.getframerate()
+    except:
+        sampling_rate=16000
 
 pygame.mixer.init(frequency=sampling_rate)
 pygame.mixer.music.load(args.soundfile)

@@ -17,7 +17,7 @@ class Camera:
         min_area=5000,
         min_alert_seconds=8.0,
         min_motion_frames=8,
-        greeting_sound="/home/pi/mnt/gdrive/Brian/17.wav",
+        greeting_sound="/home/pi/mnt/gdrive/TV/brian_badonde/17.wav",
         save_image=True,
         save_image_location="/home/pi/mnt/gdrive/images",
     ):
@@ -35,6 +35,7 @@ class Camera:
         self.camera = PiCamera()
         self.camera.resolution = tuple(resolution)
         self.camera.framerate = fps
+        self.camera.rotation = 180
         self.rawCapture = PiRGBArray(self.camera, size=tuple(resolution))
 
         # initialize detection variables

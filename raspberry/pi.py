@@ -6,13 +6,13 @@ from raspberry.button import ButtonArray
 class RaspberryPi:
     def __init__(self):
 
-        button_names = ["Brian", "Mowbros", "Random", "Alert"]
+        button_names = ["TV", "Films", "Memes", "recordings"]
 
         button_name_to_pin = {
-            "Brian": 20,  # 38,
-            "Mowbros": 12,  # 32,
-            "Random": 21,  # 40,
-            "Alert": 16,  # 36,
+            "TV": 20,  # 38,
+            "Films": 12,  # 32,
+            "recordings": 21,  # 40,
+            "Memes": 16,  # 36,
         }
         self.buttons = ButtonArray(button_names, button_name_to_pin)
 
