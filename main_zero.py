@@ -17,7 +17,7 @@ try:
         if flash_process is None or not flash_process.is_alive():
             # LED turn on in waves for "waiting" state
             if wait_process is None or not wait_process.is_alive():
-                wait_process = Process(target=pi.leds.wave, args=(0.1,))
+                wait_process = Process(target=pi.leds.wave, args=(0.6,))
                 wait_process.start()
 
 
@@ -37,7 +37,8 @@ try:
                     time.sleep(0.05)
 
                     pi.leds.set_brightness(level)
-                    level = level + (100 * 0.05 / 3)
+                    if total_time < 3:
+                        level = level + (100 * 0.05 / 3)
 
                 pi.leds.stop_pwm()
                 pi.leds.turn_on()
